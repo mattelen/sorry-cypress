@@ -10,7 +10,18 @@ RUN yarn install --frozen-lockfile
 RUN yarn workspace @sorry-cypress/common build
 RUN yarn workspace @sorry-cypress/dashboard build
 
-FROM nginx:1.22-alpine
+FROM nginx:1.22-alpine AS default
+WORKDIR /usr/share/nginx/html
+COPY packages/dashboard/nginx/default.conf.template /etc/nginx/templates/default.conf.template
+COPY packages/dashboard/server/static .
+COPY --from=build /app/packages/dashboard/dist .
+COPY --from=build /app/packages/dashboard/dist/views/index.ejs index.html
+ENV GRAPHQL_SCHEMA_URL "http://localhost:4000"
+ENV CI_URL ""
+ENV GRAPHQL_CLIENT_CREDENTIALS ""
+
+
+FROM nginxinc/nginx-unprivileged:1.22.0-alpine AS unprivileged
 WORKDIR /usr/share/nginx/html
 COPY packages/dashboard/nginx/default.conf.template /etc/nginx/templates/default.conf.template
 COPY packages/dashboard/server/static .

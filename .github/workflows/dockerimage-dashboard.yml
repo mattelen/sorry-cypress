@@ -26,3 +26,6 @@ jobs:
 
       - name: Dockerhub Release
         run: ./scripts/release-dockerhub.sh -s dashboard
+
+      - name: Dockerhub Release
+        run: ./scripts/release-dockerhub.sh -s dashboard-nginx-unprivileged
